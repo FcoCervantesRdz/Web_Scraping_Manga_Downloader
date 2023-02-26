@@ -3,6 +3,7 @@ import shutil
 import os
 from PIL import Image
 from bs4 import BeautifulSoup
+import streamlit as st
 main_page = 'https://ww5.manganelo.tv/'
 
 # Needed functions
@@ -109,8 +110,8 @@ def create_PDF(manga_code:str, chapter_name:str, imgs_paths:list):
         raise TypeError('"chapter_name" must be a string.')
     elif type(imgs_paths)!=list:
         raise TypeError('"imgs_paths" must be a list.')
-    elif len(imgs_paths)<=1:
-        raise ValueError('"imgs_paths" must have at least two elements.')
+    elif len(imgs_paths)==0:
+        raise ValueError('"imgs_paths" must have at least one elements.')
     imgs_list = [Image.open(path).convert('RGB') for path in imgs_paths[1:]]
     pdf_path = './mangas/'+manga_code+'-'+chapter_name+'.pdf'
     if os.path.isfile(pdf_path):
@@ -118,7 +119,7 @@ def create_PDF(manga_code:str, chapter_name:str, imgs_paths:list):
     Image.open(imgs_paths[0]).convert('RGB').save(pdf_path, save_all=True, append_images=imgs_list)
     return pdf_path
 
-def download_selected_chapters(selected_chapters_elements:list, manga_code:str):
+def download_selected_chapters(selected_chapters_elements:list, manga_code:str, chapters_bar, pages_bar):
     """This function download all selected chapters"""
     global main_page
     if type(selected_chapters_elements)!= list:
@@ -126,10 +127,20 @@ def download_selected_chapters(selected_chapters_elements:list, manga_code:str):
     elif len(selected_chapters_elements) == 0:
         raise ValueError('"selected_chapters_elements" must have at least one element')
     chapters_paths = []
+    chapter_counter = 0
     for chapter_element in selected_chapters_elements:
+        pages_bar.progress(0.0, text="Downloading pages...")
+        chapters_bar.progress(chapter_counter/len(selected_chapters_elements),text="Downloaded chapters "+str(chapter_counter)+" of "+str(len(selected_chapters_elements))+"...")
         chapter_url = main_page + chapter_element['href']
         chapter_r = requests.get(chapter_url) #Get into chapter's page
         if chapter_r.status_code == 200:
+            chapter_name = convert_proper_name(chapter_element.text)
+            if os.path.exists('./mangas/'+manga_code+'-'+chapter_name+'.pdf'):
+                chapters_paths.append('./mangas/'+manga_code+'-'+chapter_name+'.pdf')
+                pages_bar.progress(1.0, text="Downloaded all pages...")
+                chapter_counter += 1
+                chapters_bar.progress(chapter_counter/len(selected_chapters_elements),text="Downloaded chapters "+str(chapter_counter)+" of "+str(len(selected_chapters_elements))+"...")
+                continue
             chapter_html = BeautifulSoup(chapter_r.content, 'html.parser')
             clean_imgs()
             #Get all images in chapter
@@ -144,8 +155,10 @@ def download_selected_chapters(selected_chapters_elements:list, manga_code:str):
                 path = download_image(img_url,img_name)
                 imgs_paths.append(path)
                 counter += 1
-            chapter_name = convert_proper_name(chapter_element.text)
+                pages_bar.progress(counter/num_pages, text="Downloaded pages "+str(counter)+" of "+str(num_pages)+"...")
             chapters_paths.append(create_PDF(manga_code, chapter_name, imgs_paths))
             clean_imgs()
+        chapter_counter += 1
+        chapters_bar.progress(chapter_counter/len(selected_chapters_elements),text="Downloaded chapters "+str(chapter_counter)+" of "+str(len(selected_chapters_elements))+"...")
 
     return chapters_paths
