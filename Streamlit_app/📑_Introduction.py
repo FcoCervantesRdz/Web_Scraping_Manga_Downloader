@@ -1,6 +1,7 @@
 import streamlit as st
 from PIL import Image
-
+from functions import clean_mangas
+clean_mangas()
 st.set_page_config(
     page_title="Introduction", 
     page_icon="👋"
