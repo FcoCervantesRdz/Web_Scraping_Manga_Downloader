@@ -7,38 +7,58 @@ st.set_page_config(
 )
 
 st.markdown('# Manga Downloader 📘')
+st.markdown("""To find a code, search in [Manganelo](https://ww5.manganelo.tv/),
+            if you want to try an example, you can use 'ne990439'""")
 chapters_elements = []
 chapters_names = []
 selected_chapters_name = []
 col0_1, col0_2 = st.columns(2)
 
-def find_manga():
-    global chapters_names, chapters_elements, col0_1, col0_2, manga_code
-    with col0_1:
-        manga_code = st.text_input("Manga's Code:", 'ne990439')
+clean_imgs()
+
+# Get the manga code from the user:
+with col0_1:
+    manga_code = st.text_input("Manga's Code:", placeholder='Example: ne990439')
+if manga_code != '':
+    try:
+        chapters_elements = get_chapters_elements(manga_code)
+    except ValueError:
+        with col0_1:
+            st.error("It looks that's not a correct manga code, check the section 'FAQ' for more information.")
+
+# Get the chapters from the user
+if len(chapters_elements) != 0:
+        chapters_names = [chapter_element.text for chapter_element in chapters_elements]
+        chapters_names.reverse()
+with col0_2:
+    bool_chapters_selected = st.checkbox('Chapters selected...')
+with col0_1:
+    selected_chapters_name = st.multiselect(
+        'Select the chapters you want to download:',
+        chapters_names,
+        disabled=bool_chapters_selected)
+    if bool_chapters_selected:
+        if len(selected_chapters_name) == 0:
+            st.error('Select at least one chapther...')
+        else:
+            selected_chapters_elements = [selected_chapter for selected_chapter in chapters_elements if selected_chapter.text in selected_chapters_name]
+
+# Downloading
+if len(selected_chapters_name) != 0 and bool_chapters_selected:
     with col0_2:
-        st.markdown("To find a code, search in [Manganelo](https://ww5.manganelo.tv/)")
-        if st.checkbox('Search manga'):
-            clean_mangas()
-            clean_imgs()
-            chapters_elements = get_chapters_elements(manga_code)
-            select_chapters()
+        # with st.spinner('Downloading selected chapters'):
+        #     chapter_paths = download_selected_chapters(selected_chapters_elements, manga_code)
+        chapters_bar = st.progress(0.0, text="Downloading chapters...")
+        pages_bar = st.progress(0.0, "Downloading pages...")
+        chapter_paths = download_selected_chapters(selected_chapters_elements, manga_code, chapters_bar, pages_bar)
+        st.success('The chapters have been succesfully donwnloaded!')
+        for chapter_path in chapter_paths:
+            file_name = chapter_path.split('/')[-1]
+            with open(chapter_path,'rb') as file:
+                st.download_button(
+                    label="Download "+file_name,
+                    data=file,
+                    file_name=file_name,
+                )
 
-def select_chapters():
-    global chapters_names, chapters_elements, col0_1, manga_code, selected_chapters_name
-    if len(chapters_elements) != 0:
-            chapters_names = [chapter_element.text for chapter_element in chapters_elements]
-            chapters_names.reverse()
-    with col0_1:
-        selected_chapters_name = st.multiselect(
-            'Select the chapters you want to download:',
-            chapters_names)
-        if st.checkbox('Ready...'):
-            if len(selected_chapters_name) != 0:
-                print('Hola mundo')
-
-find_manga()
-
-# chapters_elements = get_chapters_elements(manga_code)
-# selected_chapters_elements = select_chapters_elements(chapters_elements)
 
