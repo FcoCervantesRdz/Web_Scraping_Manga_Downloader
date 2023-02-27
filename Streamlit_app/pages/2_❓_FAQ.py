@@ -30,7 +30,7 @@ st.markdown("""
     [*Beyond the sky*](https://ww5.manganelo.tv/manga/manga-ne990439)), you will be able 
     to see the code on the url after 'ww5.manganelo.tv/manga/manga-', as you can apreciate in the image:
 """)
-st.image(Image.open('./../imgs/manga_url_ss.png'), caption='Manga_url SS')
+st.image(Image.open('./imgs/manga_url_ss.png'), caption='Manga_url SS')
 st.markdown("""
     In this example, the code is 'ne990439'
 """)
