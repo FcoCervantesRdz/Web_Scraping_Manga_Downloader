@@ -50,6 +50,20 @@ def clean_mangas():
     except:
         return
 
+def search(text: str):
+    """This function returns a list of 'a' elements that represent the results 
+    of the searching"""
+    if type(text) != str:
+        raise TypeError('"text" must be a string')
+    elif len(text) == 0:
+        raise ValueError('"text" must have any character')
+    url = 'https://ww5.manganelo.tv/search/' + text
+    r = requests.get(url)
+    if r.status_code == 200:
+        search_html = BeautifulSoup(r.content, 'html.parser')
+        return search_html.find_all('a', class_="a-h text-nowrap item-title")
+    else:
+        return None
 
 def get_chapters_elements(manga_code:str):
     global main_page

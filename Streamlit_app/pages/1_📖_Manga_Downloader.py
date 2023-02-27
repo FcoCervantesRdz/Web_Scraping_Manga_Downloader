@@ -9,16 +9,30 @@ st.set_page_config(
 st.markdown('# Manga Downloader 📘')
 st.markdown("""To find a code, search in [Manganelo](https://ww5.manganelo.tv/),
             if you want to try an example, you can use 'ne990439'""")
+clean_imgs()
+manga_search = st.text_input("Search for any manga:", placeholder='Example: Beyond the sky')
+col0_1, col0_2 = st.columns(2)
+
 chapters_elements = []
 chapters_names = []
 selected_chapters_name = []
-col0_1, col0_2 = st.columns(2)
+manga_code = ''
+name = ''
+if manga_search != '':
+    searched_elements = search(manga_search)
+        # Get manga from the user
+    if not searched_elements is None and len(searched_elements)!=0:
+        names = [element.text for element in searched_elements]
+        with col0_1:
+            name = st.selectbox('Choose one', names)
+    else:
+        with col0_1:
+            st.error('Try another search')
 
-clean_imgs()
+if name != '':
+    selected_element = [element for element in searched_elements if element.text == name][0]
+    manga_code = selected_element['href'].split('-')[-1]
 
-# Get the manga code from the user:
-with col0_1:
-    manga_code = st.text_input("Manga's Code:", placeholder='Example: ne990439')
 if manga_code != '':
     try:
         chapters_elements = get_chapters_elements(manga_code)
@@ -28,20 +42,20 @@ if manga_code != '':
 
 # Get the chapters from the user
 if len(chapters_elements) != 0:
-        chapters_names = [chapter_element.text for chapter_element in chapters_elements]
-        chapters_names.reverse()
-with col0_2:
-    bool_chapters_selected = st.checkbox('Chapters selected...')
-with col0_1:
-    selected_chapters_name = st.multiselect(
-        'Select the chapters you want to download:',
-        chapters_names,
-        disabled=bool_chapters_selected)
-    if bool_chapters_selected:
-        if len(selected_chapters_name) == 0:
-            st.error('Select at least one chapther...')
-        else:
-            selected_chapters_elements = [selected_chapter for selected_chapter in chapters_elements if selected_chapter.text in selected_chapters_name]
+    chapters_names = [chapter_element.text for chapter_element in chapters_elements]
+    chapters_names.reverse()
+    with col0_2:
+        bool_chapters_selected = st.checkbox('Chapters selected...')
+    with col0_1:
+        selected_chapters_name = st.multiselect(
+            'Select the chapters you want to download:',
+            chapters_names,
+            disabled=bool_chapters_selected)
+        if bool_chapters_selected:
+            if len(selected_chapters_name) == 0:
+                st.error('Select at least one chapther...')
+            else:
+                selected_chapters_elements = [selected_chapter for selected_chapter in chapters_elements if selected_chapter.text in selected_chapters_name]
 
 # Downloading
 if len(selected_chapters_name) != 0 and bool_chapters_selected:
@@ -60,5 +74,4 @@ if len(selected_chapters_name) != 0 and bool_chapters_selected:
                     data=file,
                     file_name=file_name,
                 )
-
 
