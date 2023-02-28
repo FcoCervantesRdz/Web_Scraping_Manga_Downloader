@@ -24,14 +24,13 @@ And, inside a chapter's page we can see the images: <br>
 * It has to be deployed on streamlit for the UI.
     
 ## 03 - Result
-You can access to the downloader by clicking 'Manga Downloader' on the left 👈, please 
-feel free to download any manga and, if you want, send me feedback or recomendations:
+You can access to the downloader by the next streamlit cloud link:
+* **[Manga Downloader](https://fcocervantesrdz-mangadownload.streamlit.app/Manga_Downloader)** 
+
+Please, feel free to download any manga and, if you want, send me feedback or recomendations:
 * 🟦 *LinkedIn*: [@FcoCervantesRdz](https://www.linkedin.com/in/fcocervantesrdz/)
 * 📧 *Mail*: [fco.cervantesrdz@gmail.com](mailto:fco.cervantesrdz@gmail.com)
 * ⚙  *Github*: [FcoCervantesRdz](https://github.com/FcoCervantesRdz)
-
-Also, you can see the github repository in:
-* ⚙ *Github Repository*: [Web Scraping Manga Downloader](https://github.com/FcoCervantesRdz/Web_Scraping_Manga_Downloader)
 
 
 
