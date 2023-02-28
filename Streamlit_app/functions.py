@@ -143,17 +143,17 @@ def download_selected_chapters(selected_chapters_elements:list, manga_code:str, 
     chapters_paths = []
     chapter_counter = 0
     for chapter_element in selected_chapters_elements:
-        pages_bar.progress(0.0, text="Downloading pages...")
-        chapters_bar.progress(chapter_counter/len(selected_chapters_elements),text="Downloaded chapters "+str(chapter_counter)+" of "+str(len(selected_chapters_elements))+"...")
+        pages_bar.progress(0.0, text="Getting pages from Manganelo...")
+        chapters_bar.progress(chapter_counter/len(selected_chapters_elements),text="Converted chapters "+str(chapter_counter)+" of "+str(len(selected_chapters_elements))+"...")
         chapter_url = main_page + chapter_element['href']
         chapter_r = requests.get(chapter_url) #Get into chapter's page
         if chapter_r.status_code == 200:
             chapter_name = convert_proper_name(chapter_element.text)
             if os.path.exists('./mangas/'+manga_code+'-'+chapter_name+'.pdf'):
                 chapters_paths.append('./mangas/'+manga_code+'-'+chapter_name+'.pdf')
-                pages_bar.progress(1.0, text="Downloaded all pages...")
+                pages_bar.progress(1.0, text="Getting all pages...")
                 chapter_counter += 1
-                chapters_bar.progress(chapter_counter/len(selected_chapters_elements),text="Downloaded chapters "+str(chapter_counter)+" of "+str(len(selected_chapters_elements))+"...")
+                chapters_bar.progress(chapter_counter/len(selected_chapters_elements),text="Converted chapters "+str(chapter_counter)+" of "+str(len(selected_chapters_elements))+"...")
                 continue
             chapter_html = BeautifulSoup(chapter_r.content, 'html.parser')
             clean_imgs()
@@ -169,10 +169,10 @@ def download_selected_chapters(selected_chapters_elements:list, manga_code:str, 
                 path = download_image(img_url,img_name)
                 imgs_paths.append(path)
                 counter += 1
-                pages_bar.progress(counter/num_pages, text="Downloaded pages "+str(counter)+" of "+str(num_pages)+"...")
+                pages_bar.progress(counter/num_pages, text="Getting pages "+str(counter)+" of "+str(num_pages)+"...")
             chapters_paths.append(create_PDF(manga_code, chapter_name, imgs_paths))
             clean_imgs()
         chapter_counter += 1
-        chapters_bar.progress(chapter_counter/len(selected_chapters_elements),text="Downloaded chapters "+str(chapter_counter)+" of "+str(len(selected_chapters_elements))+"...")
+        chapters_bar.progress(chapter_counter/len(selected_chapters_elements),text="Converted chapters "+str(chapter_counter)+" of "+str(len(selected_chapters_elements))+"...")
 
     return chapters_paths

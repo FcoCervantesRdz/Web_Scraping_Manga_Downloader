@@ -60,12 +60,23 @@ if len(chapters_elements) != 0:
 # Downloading
 if len(selected_chapters_name) != 0 and bool_chapters_selected:
     with col0_2:
-        # with st.spinner('Downloading selected chapters'):
-        #     chapter_paths = download_selected_chapters(selected_chapters_elements, manga_code)
-        chapters_bar = st.progress(0.0, text="Downloading chapters...")
-        pages_bar = st.progress(0.0, "Downloading pages...")
-        chapter_paths = download_selected_chapters(selected_chapters_elements, manga_code, chapters_bar, pages_bar)
-        st.success('The chapters have been succesfully donwnloaded!')
+        downloaded = True
+        chapter_paths = []
+        for chapter_element in selected_chapters_elements:
+            if not os.path.exists('./mangas/'+manga_code+'-'+convert_proper_name(chapter_element.text)+'.pdf'):
+                downloaded = False
+                chapter_paths = []
+                break
+            chapter_paths.append('./mangas/'+manga_code+'-'+convert_proper_name(chapter_element.text)+'.pdf')
+        if not downloaded:
+            space_chapbar = st.empty()
+            space_pagebar = st.empty()
+            chapters_bar = space_chapbar.progress(0.0, text="Converting chapters to PDF...")
+            pages_bar = space_pagebar.progress(0.0, "Getting pages from Manganelo...")
+            chapter_paths = download_selected_chapters(selected_chapters_elements, manga_code, chapters_bar, pages_bar)
+            space_chapbar.empty()
+            space_pagebar.empty()
+        st.success('The chapters have been succesfully Converted!')
         for chapter_path in chapter_paths:
             file_name = chapter_path.split('/')[-1]
             with open(chapter_path,'rb') as file:
