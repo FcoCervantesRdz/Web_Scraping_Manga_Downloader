@@ -7,8 +7,9 @@ st.set_page_config(
 )
 
 st.markdown('# Manga Downloader 📘')
-st.markdown("""To find a code, search in [Manganelo](https://ww5.manganelo.tv/),
-            if you want to try an example, you can use 'ne990439'""")
+st.markdown("""
+If you want to see mangas available by catalog, you can acces to [Manganelo](https://ww5.manganelo.tv/).
+""")
 clean_imgs()
 manga_search = st.text_input("Search for any manga:", placeholder='Example: Beyond the sky')
 col0_1, col0_2 = st.columns(2)
